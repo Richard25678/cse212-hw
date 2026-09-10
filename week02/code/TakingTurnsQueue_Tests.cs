@@ -9,9 +9,9 @@ public class TakingTurnsQueueTests
 {
     [TestMethod]
     // Scenario: Create a queue with the following people and turns: Bob (2), Tim (5), Sue (3) and
-    // run until the queue is empty
-    // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
-    // Defect(s) Found: 
+    // run until the queue is empty.
+    // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim.
+    // Defect(s) Found: The queue was storing people in reverse order, so the first person removed was the last person added. The turn logic also failed to requeue people correctly after they used a turn.
     public void TestTakingTurnsQueue_FiniteRepetition()
     {
         var bob = new Person("Bob", 2);
@@ -40,10 +40,10 @@ public class TakingTurnsQueueTests
     }
 
     [TestMethod]
-    // Scenario: Create a queue with the following people and turns: Bob (2), Tim (5), Sue (3)
-    // After running 5 times, add George with 3 turns.  Run until the queue is empty.
-    // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, George, Sue, Tim, George, Tim, George
-    // Defect(s) Found: 
+    // Scenario: Create a queue with the following people and turns: Bob (2), Tim (5), Sue (3).
+    // After running 5 times, add George with 3 turns and run until the queue is empty.
+    // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, George, Sue, Tim, George, Tim, George.
+    // Defect(s) Found: Newly added people were not being placed in the correct queue order, and the turn rotation logic did not preserve the expected sequence after a mid-queue insertion.
     public void TestTakingTurnsQueue_AddPlayerMidway()
     {
         var bob = new Person("Bob", 2);
@@ -82,10 +82,10 @@ public class TakingTurnsQueueTests
     }
 
     [TestMethod]
-    // Scenario: Create a queue with the following people and turns: Bob (2), Tim (Forever), Sue (3)
+    // Scenario: Create a queue with the following people and turns: Bob (2), Tim (Forever), Sue (3).
     // Run 10 times.
-    // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
-    // Defect(s) Found: 
+    // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim.
+    // Defect(s) Found: A person with 0 turns was not treated as infinite, and the queue order was reversed, which changed the expected rotation pattern.
     public void TestTakingTurnsQueue_ForeverZero()
     {
         var timTurns = 0;
@@ -113,10 +113,10 @@ public class TakingTurnsQueueTests
     }
 
     [TestMethod]
-    // Scenario: Create a queue with the following people and turns: Tim (Forever), Sue (3)
+    // Scenario: Create a queue with the following people and turns: Tim (Forever), Sue (3).
     // Run 10 times.
-    // Expected Result: Tim, Sue, Tim, Sue, Tim, Sue, Tim, Tim, Tim, Tim
-    // Defect(s) Found: 
+    // Expected Result: Tim, Sue, Tim, Sue, Tim, Sue, Tim, Tim, Tim, Tim.
+    // Defect(s) Found: Negative-turn people were not being handled as infinite-turn people, and the queue order was reversed, so the turn order was incorrect.
     public void TestTakingTurnsQueue_ForeverNegative()
     {
         var timTurns = -3;
@@ -141,9 +141,9 @@ public class TakingTurnsQueueTests
     }
 
     [TestMethod]
-    // Scenario: Try to get the next person from an empty queue
-    // Expected Result: Exception should be thrown with appropriate error message.
-    // Defect(s) Found: 
+    // Scenario: Try to get the next person from an empty queue.
+    // Expected Result: An InvalidOperationException should be thrown with the message "No one in the queue.".
+    // Defect(s) Found: This confirms the required empty-queue exception behavior once the queue ordering and turn-handling issues are fixed.
     public void TestTakingTurnsQueue_Empty()
     {
         var players = new TakingTurnsQueue();
